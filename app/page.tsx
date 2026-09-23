@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 interface Product {
@@ -9,25 +12,22 @@ interface Product {
   image: string;
 }
 
-async function getProducts(): Promise<Product[]> {
-  try {
-    const res = await fetch("https://fakestoreapi.com/products", {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-      },
-      cache: "no-store",
-    });
+export default function HomePage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-    if (!res.ok) return [];
-    return res.json();
-  } catch (error) {
-    console.error("Failed to fetch products:", error);
-    return [];
-  }
-}
-
-export default async function HomePage() {
-  const products = await getProducts();
+  useEffect(() => {
+    fetch("https://fakestoreapi.com/products")
+      .then((res) => res.json())
+      .then((data) => {
+        setProducts(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Client fetch error:", err);
+        setLoading(false);
+      });
+  }, []);
 
   return (
     <main className="min-h-screen p-8 max-w-6xl mx-auto flex flex-col items-center">
@@ -38,9 +38,13 @@ export default async function HomePage() {
         Indexed for Vertex AI Search Crawler Testing
       </p>
 
-      {products.length === 0 ? (
+      {loading ? (
+        <p className="text-blue-600 font-medium my-12 animate-pulse">
+          Loading products...
+        </p>
+      ) : products.length === 0 ? (
         <p className="text-gray-500 font-medium my-12">
-          Unable to load products right now. Please refresh in a moment.
+          Unable to load products. Please check network connection.
         </p>
       ) : (
         <section className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
