@@ -10,15 +10,24 @@ interface Product {
   image: string;
 }
 
+// Replace your current getProducts function with this block:
 async function getProducts(): Promise<Product[]> {
   try {
     const res = await fetch("https://fakestoreapi.com/products", {
-      next: { revalidate: 3600 },
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+      },
+      cache: "no-store", // Forces fresh fetching on every page request
     });
-    if (!res.ok) return [];
+
+    if (!res.ok) {
+      console.error(`API response failed with status: ${res.status}`);
+      return [];
+    }
+
     return res.json();
   } catch (error) {
-    console.error("Failed to fetch products during build:", error);
+    console.error("Failed to fetch products during request:", error);
     return [];
   }
 }
