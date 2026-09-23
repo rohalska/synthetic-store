@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 
 interface Product {
   id: number;
@@ -10,24 +9,19 @@ interface Product {
   image: string;
 }
 
-// Replace your current getProducts function with this block:
 async function getProducts(): Promise<Product[]> {
   try {
     const res = await fetch("https://fakestoreapi.com/products", {
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
       },
-      cache: "no-store", // Forces fresh fetching on every page request
+      cache: "no-store",
     });
 
-    if (!res.ok) {
-      console.error(`API response failed with status: ${res.status}`);
-      return [];
-    }
-
+    if (!res.ok) return [];
     return res.json();
   } catch (error) {
-    console.error("Failed to fetch products during request:", error);
+    console.error("Failed to fetch products:", error);
     return [];
   }
 }
@@ -57,12 +51,11 @@ export default async function HomePage() {
               className="border rounded-lg p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between bg-white"
             >
               <div>
-                <div className="relative w-full h-48 mb-4">
-                  <Image
+                <div className="w-full h-48 mb-4 flex items-center justify-center">
+                  <img
                     src={product.image}
                     alt={product.title}
-                    fill
-                    className="object-contain"
+                    className="max-h-full max-w-full object-contain"
                   />
                 </div>
                 <h2 className="font-semibold text-lg text-gray-800 line-clamp-2">
